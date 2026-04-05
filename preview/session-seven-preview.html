@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Leads — Session 7 preview (static)</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #171717;
+        --muted: rgba(23, 23, 23, 0.65);
+        --border: rgba(23, 23, 23, 0.2);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0a0a;
+          --fg: #ededed;
+          --muted: rgba(237, 237, 237, 0.65);
+          --border: rgba(237, 237, 237, 0.2);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.45;
+        padding: 1.25rem 1rem 2.5rem;
+        max-width: 36rem;
+        margin-inline: auto;
+      }
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.02em;
+      }
+      .muted {
+        font-size: 0.875rem;
+        color: var(--muted);
+        margin: 0 0 1rem;
+      }
+      .checklist {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        margin: 0 0 1.25rem;
+        padding-left: 1.25rem;
+      }
+      .checklist li {
+        margin-bottom: 0.35rem;
+      }
+      code {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.35rem;
+        border-radius: 0.25rem;
+        background: rgba(127, 127, 127, 0.12);
+      }
+      .cols {
+        font-size: 0.8125rem;
+        columns: 2;
+        column-gap: 1.5rem;
+        margin: 0 0 1rem;
+        padding-left: 1.25rem;
+      }
+      .cols li {
+        break-inside: avoid;
+        margin-bottom: 0.2rem;
+      }
+      button {
+        min-height: 44px;
+        padding: 0 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        background: var(--fg);
+        color: var(--bg);
+        cursor: pointer;
+        font-family: inherit;
+      }
+      button.secondary {
+        background: transparent;
+        color: var(--fg);
+        margin-left: 0.5rem;
+      }
+      pre {
+        font-size: 0.65rem;
+        overflow: auto;
+        max-height: 10rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        background: rgba(127, 127, 127, 0.06);
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Session 7 — CSV export (static preview)</h1>
+    <p class="muted">
+      No server. The live app uses
+      <code>GET /api/events/[eventId]/leads-csv</code> (session cookie). Here you
+      can confirm <strong>column names</strong>, <strong>escaping</strong> (commas,
+      quotes), <strong>JSON cells</strong> for <code>ai_*</code>, and a UTF-8
+      <strong>BOM</strong> for Excel — same rules as
+      <code>lib/leads/leads-to-csv.ts</code>.
+    </p>
+    <ul class="checklist">
+      <li>Open the downloaded file in Excel or Sheets; headers should align.</li>
+      <li>Sample row includes a transcript with a comma (must stay one cell).</li>
+      <li>
+        <code>ai_pain_points</code> / <code>ai_interests</code> appear as JSON
+        strings in one cell.
+      </li>
+    </ul>
+
+    <p class="muted" style="margin-bottom: 0.35rem">
+      Columns (order matches export):
+    </p>
+    <ol class="cols" id="colList"></ol>
+
+    <p>
+      <button type="button" id="btnDl">Download sample CSV</button>
+      <button type="button" id="btnPeek" class="secondary">Toggle preview</button>
+    </p>
+    <pre id="peek" hidden></pre>
+
+    <script>
+      (function () {
+        var HEADERS = [
+          "id",
+          "event_id",
+          "captured_by",
+          "first_name",
+          "last_name",
+          "company",
+          "job_title",
+          "email",
+          "phone",
+          "source_tag",
+          "temperature",
+          "transcript",
+          "ai_pain_points",
+          "ai_interests",
+          "ai_next_steps",
+          "ai_urgency",
+          "ai_temperature",
+          "ai_temperature_reason",
+          "consent_given",
+          "consent_timestamp",
+          "created_at",
+        ];
+
+        var list = document.getElementById("colList");
+        HEADERS.forEach(function (h) {
+          var li = document.createElement("li");
+          li.textContent = h;
+          list.appendChild(li);
+        });
+
+        function escapeCsvField(raw) {
+          if (/[",\r\n]/.test(raw)) {
+            return '"' + raw.replace(/"/g, '""') + '"';
+          }
+          return raw;
+        }
+
+        function cell(value) {
+          if (value === null || value === undefined) {
+            return escapeCsvField("");
+          }
+          if (typeof value === "boolean") {
+            return value ? "true" : "false";
+          }
+          if (typeof value === "object") {
+            return escapeCsvField(JSON.stringify(value));
+          }
+          return escapeCsvField(String(value));
+        }
+
+        function row(obj) {
+          return HEADERS.map(function (key) {
+            return cell(obj[key]);
+          }).join(",");
+        }
+
+        var sample = {
+          id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+          event_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+          captured_by: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+          first_name: "Jordan",
+          last_name: "Lee",
+          company: "Northwind Labs",
+          job_title: "Ops Lead",
+          email: "jordan@example.com",
+          phone: "+1 555-0100",
+          source_tag: "walked_by",
+          temperature: "hot",
+          transcript:
+            'Said they are "done" with spreadsheets, wants API, budget TBD.',
+          ai_pain_points: [
+            "Manual reporting",
+            "No single source of truth",
+          ],
+          ai_interests: ["API", "Salesforce"],
+          ai_next_steps: ["Book demo", "Send pricing"],
+          ai_urgency: "high",
+          ai_temperature: "hot",
+          ai_temperature_reason: "Strong interest; follow-up accepted.",
+          consent_given: true,
+          consent_timestamp: "2026-04-03T14:15:00.000Z",
+          created_at: "2026-04-03T14:20:00.000Z",
+        };
+
+        function buildCsv() {
+          var headerLine = HEADERS.map(escapeCsvField).join(",");
+          var body = row(sample);
+          return headerLine + "\r\n" + body;
+        }
+
+        var peek = document.getElementById("peek");
+        document.getElementById("btnPeek").addEventListener("click", function () {
+          peek.hidden = !peek.hidden;
+          peek.textContent = "\uFEFF" + buildCsv();
+        });
+
+        document.getElementById("btnDl").addEventListener("click", function () {
+          var csv = "\uFEFF" + buildCsv();
+          var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "session-seven-sample-leads.csv";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        });
+      })();
+    </script>
+  </body>
+</html>

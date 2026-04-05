@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Leads — Session 1 preview (static)</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #171717;
+        --muted: rgba(23, 23, 23, 0.65);
+        --border: rgba(23, 23, 23, 0.2);
+        --danger: #b91c1c;
+        --code-bg: rgba(23, 23, 23, 0.06);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0a0a;
+          --fg: #ededed;
+          --muted: rgba(237, 237, 237, 0.65);
+          --border: rgba(237, 237, 237, 0.2);
+          --danger: #f87171;
+          --code-bg: rgba(237, 237, 237, 0.08);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.45;
+      }
+      .screen {
+        display: none;
+        min-height: 100vh;
+        padding: 1.5rem 1rem 2rem;
+        max-width: 28rem;
+        margin: 0 auto;
+      }
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .screen.scroll {
+        justify-content: flex-start;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem;
+      }
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+      .lead {
+        font-size: 1.125rem;
+        color: var(--fg);
+        opacity: 0.85;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+      }
+      legend {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .radio-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: 44px;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
+      }
+      .btn-primary {
+        background: var(--fg);
+        color: var(--bg);
+      }
+      .btn-primary:hover {
+        opacity: 0.92;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--fg);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        background: rgba(127, 127, 127, 0.08);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--muted);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        min-height: 44px;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      @media (min-width: 640px) {
+        .row.horizontal {
+          flex-direction: row;
+        }
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        background: rgba(127, 127, 127, 0.03);
+      }
+      .banner {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--fg);
+      }
+      code {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.35rem;
+        border-radius: 0.25rem;
+        background: var(--code-bg);
+      }
+      ul.nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      ul.nav a {
+        color: var(--fg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .header-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      @media (min-width: 640px) {
+        .header-bar {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: space-between;
+        }
+      }
+      .error {
+        color: var(--danger);
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="banner"
+      style="max-width: 28rem; margin: 0 auto; border-radius: 0"
+    >
+      <strong>Static preview only.</strong> No Supabase, no network — buttons
+      switch screens so you can sanity-check Session 1 flows.
+    </div>
+
+    <!-- Landing -->
+    <section id="screen-landing" class="screen active">
+      <div>
+        <h1>Event Leads</h1>
+        <p class="lead" style="margin-top: 0.75rem">
+          Turn booth conversations into CRM-ready leads in under thirty
+          seconds.
+        </p>
+      </div>
+      <div class="row horizontal">
+        <button type="button" class="btn btn-primary" data-go="login">
+          Sign in
+        </button>
+        <button type="button" class="btn btn-secondary" data-go="signup">
+          Create account
+        </button>
+      </div>
+    </section>
+
+    <!-- Login -->
+    <section id="screen-login" class="screen">
+      <div>
+        <h1>Sign in</h1>
+        <p style="margin-top: 0.25rem">
+          Event Leads — capture qualified leads on the floor.
+        </p>
+      </div>
+      <form class="row" data-form="login">
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+        <p class="error" data-login-error hidden>
+          In the real app, errors come from Supabase. This preview always
+          succeeds.
+        </p>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+      <p style="text-align: center">
+        No account?
+        <button type="button" class="btn btn-ghost" data-go="signup">
+          Create one
+        </button>
+      </p>
+      <button type="button" class="btn btn-ghost" data-go="landing">
+        ← Back
+      </button>
+    </section>
+
+    <!-- Signup -->
+    <section id="screen-signup" class="screen">
+      <div>
+        <h1>Create account</h1>
+        <p style="margin-top: 0.25rem">
+          Use your work email. You will set your company next.
+        </p>
+      </div>
+      <form class="row" data-form="signup">
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            required
+            minlength="8"
+          />
+        </label>
+        <button type="submit" class="btn btn-primary">Sign up</button>
+      </form>
+      <p style="text-align: center">
+        Already have an account?
+        <button type="button" class="btn btn-ghost" data-go="login">
+          Sign in
+        </button>
+      </p>
+      <button type="button" class="btn btn-ghost" data-go="landing">
+        ← Back
+      </button>
+    </section>
+
+    <!-- Onboarding -->
+    <section id="screen-onboarding" class="screen">
+      <div>
+        <h1>Set up your workspace</h1>
+        <p style="margin-top: 0.25rem">
+          Your company and profile. You can invite teammates later.
+        </p>
+      </div>
+      <form class="row" data-form="onboarding">
+        <label>
+          Company name
+          <input type="text" name="company" autocomplete="organization" required />
+        </label>
+        <label>
+          Your full name
+          <input type="text" name="name" autocomplete="name" required />
+        </label>
+        <fieldset>
+          <legend>Role</legend>
+          <label class="radio-row">
+            <input type="radio" name="role" value="manager" required />
+            Manager — set up events and review leads
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="role" value="rep" />
+            Rep — capture leads on the floor
+          </label>
+        </fieldset>
+        <button type="submit" class="btn btn-primary">
+          Continue to dashboard
+        </button>
+      </form>
+      <form data-form="signout-preview" style="text-align: center">
+        <button type="submit" class="btn btn-ghost">
+          Sign out and use a different account
+        </button>
+      </form>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="screen-dashboard" class="screen scroll">
+      <div class="header-bar">
+        <div>
+          <h1>Events</h1>
+          <p style="margin-top: 0.25rem">
+            <span data-preview-company>Acme Corp</span> ·
+            <span data-preview-role>Manager</span>
+          </p>
+          <p style="font-size: 0.875rem; margin-top: 0.25rem" data-preview-user>
+            Alex Rep
+          </p>
+        </div>
+        <form data-form="signout-preview">
+          <button type="submit" class="btn btn-secondary">Sign out</button>
+        </form>
+      </div>
+      <div class="card">
+        <p>
+          No events yet. Session 2 will add manager event creation and the list
+          here.
+        </p>
+        <p style="margin-top: 1rem">
+          Sample stub route:
+          <button
+            type="button"
+            class="btn btn-ghost"
+            data-go="event"
+            style="padding: 0; min-height: auto; display: inline"
+          >
+            Open event (stub)
+          </button>
+        </p>
+      </div>
+    </section>
+
+    <!-- Event detail stub -->
+    <section id="screen-event" class="screen scroll">
+      <p style="font-size: 0.875rem">Event ID (stub)</p>
+      <h1>Event briefing</h1>
+      <p style="margin-top: 0.75rem">
+        Session 2+ will load the real event. Params:
+        <code>demo-event-id</code>
+      </p>
+      <ul class="nav">
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="leads">
+            Leads & export →
+          </button>
+        </li>
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="capture">
+            Capture lead →
+          </button>
+        </li>
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="dashboard">
+            ← Back to events
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Leads stub -->
+    <section id="screen-leads" class="screen scroll">
+      <h1>Leads</h1>
+      <p style="margin-top: 0.5rem">
+        Stub for lead list and CSV export. Event:
+        <code>demo-event-id</code>
+      </p>
+      <button type="button" class="btn btn-ghost" data-go="event">
+        ← Event home
+      </button>
+    </section>
+
+    <!-- Capture stub -->
+    <section id="screen-capture" class="screen scroll">
+      <h1>Capture lead</h1>
+      <p style="margin-top: 0.5rem">
+        Stub for manual fields, consent, voice, AI. Event:
+        <code>demo-event-id</code>
+      </p>
+      <button type="button" class="btn btn-ghost" data-go="event">
+        ← Event home
+      </button>
+    </section>
+
+    <script>
+      (function () {
+        var screens = {
+          landing: document.getElementById("screen-landing"),
+          login: document.getElementById("screen-login"),
+          signup: document.getElementById("screen-signup"),
+          onboarding: document.getElementById("screen-onboarding"),
+          dashboard: document.getElementById("screen-dashboard"),
+          event: document.getElementById("screen-event"),
+          leads: document.getElementById("screen-leads"),
+          capture: document.getElementById("screen-capture"),
+        };
+
+        function show(name) {
+          Object.keys(screens).forEach(function (key) {
+            screens[key].classList.remove("active");
+            if (key === "dashboard" || key === "event" || key === "leads" || key === "capture") {
+              screens[key].classList.remove("scroll");
+            }
+          });
+          var el = screens[name];
+          el.classList.add("active");
+          if (
+            name === "dashboard" ||
+            name === "event" ||
+            name === "leads" ||
+            name === "capture"
+          ) {
+            el.classList.add("scroll");
+          }
+          window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll("[data-go]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            show(btn.getAttribute("data-go"));
+          });
+        });
+
+        document.querySelector('[data-form="login"]').addEventListener("submit", function (e) {
+          e.preventDefault();
+          document.querySelector("[data-preview-company]").textContent = "Acme Corp";
+          document.querySelector("[data-preview-user]").textContent = "Returning user";
+          document.querySelector("[data-preview-role]").textContent = "Rep";
+          show("dashboard");
+        });
+
+        document.querySelector('[data-form="signup"]').addEventListener("submit", function (e) {
+          e.preventDefault();
+          show("onboarding");
+        });
+
+        document
+          .querySelector('[data-form="onboarding"]')
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            var fd = new FormData(e.target);
+            var company = fd.get("company") || "Your company";
+            var name = fd.get("name") || "You";
+            var role = fd.get("role") === "rep" ? "Rep" : "Manager";
+            document.querySelector("[data-preview-company]").textContent =
+              String(company);
+            document.querySelector("[data-preview-user]").textContent =
+              String(name);
+            document.querySelector("[data-preview-role]").textContent = role;
+            show("dashboard");
+          });
+
+        document.querySelectorAll('[data-form="signout-preview"]').forEach(function (f) {
+          f.addEventListener("submit", function (e) {
+            e.preventDefault();
+            show("landing");
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

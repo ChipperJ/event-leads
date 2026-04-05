@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Leads — Sessions 1–4B preview (static)</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #171717;
+        --muted: rgba(23, 23, 23, 0.65);
+        --border: rgba(23, 23, 23, 0.2);
+        --code-bg: rgba(23, 23, 23, 0.06);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0a0a;
+          --fg: #ededed;
+          --muted: rgba(237, 237, 237, 0.65);
+          --border: rgba(237, 237, 237, 0.2);
+          --code-bg: rgba(237, 237, 237, 0.08);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.45;
+      }
+      .screen {
+        display: none;
+        min-height: 100vh;
+        padding: 1.5rem 1rem 2rem;
+        max-width: 28rem;
+        margin: 0 auto;
+      }
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .screen.scroll {
+        justify-content: flex-start;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+      .lead {
+        font-size: 1.125rem;
+        color: var(--fg);
+        opacity: 0.85;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      input[type="date"],
+      input[type="search"],
+      textarea {
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: inherit;
+      }
+      textarea {
+        min-height: 8rem;
+        resize: vertical;
+      }
+      fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+      }
+      legend {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .radio-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: 44px;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
+      }
+      .btn-primary {
+        background: var(--fg);
+        color: var(--bg);
+      }
+      .btn-primary:hover {
+        opacity: 0.92;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--fg);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        background: rgba(127, 127, 127, 0.08);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--muted);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        min-height: 44px;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      @media (min-width: 640px) {
+        .row.horizontal {
+          flex-direction: row;
+        }
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        background: rgba(127, 127, 127, 0.03);
+      }
+      .banner {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--fg);
+      }
+      code {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.35rem;
+        border-radius: 0.25rem;
+        background: var(--code-bg);
+      }
+      .header-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      @media (min-width: 640px) {
+        .header-bar {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: space-between;
+        }
+      }
+      .event-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .event-list button {
+        width: 100%;
+        text-align: left;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: rgba(127, 127, 127, 0.03);
+        cursor: pointer;
+        font-family: inherit;
+        color: var(--fg);
+      }
+      .event-list button:hover {
+        background: rgba(127, 127, 127, 0.07);
+      }
+      .event-list .ev-name {
+        font-weight: 600;
+        display: block;
+      }
+      .event-list .ev-meta {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .ok {
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+      .briefing-h {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin: 0 0 0.75rem;
+      }
+      .briefing-scroll {
+        max-height: min(55vh, 28rem);
+        overflow-y: auto;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--fg);
+      }
+      .briefing-scroll-sm {
+        max-height: min(40vh, 22rem);
+      }
+      .briefing-body {
+        white-space: pre-wrap;
+        margin: 0;
+      }
+      .match-hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.5rem;
+        min-height: 1.25rem;
+      }
+      .stub-dashed {
+        border: 1px dashed var(--border);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-top: 1.5rem;
+      }
+      input[type="tel"],
+      select {
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: inherit;
+      }
+      .grid-2 {
+        display: grid;
+        gap: 1rem;
+      }
+      @media (min-width: 640px) {
+        .grid-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .success-banner {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        background: rgba(16, 185, 129, 0.12);
+        font-size: 0.875rem;
+        color: var(--fg);
+      }
+      .error-banner {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background: rgba(220, 38, 38, 0.12);
+        font-size: 0.875rem;
+        color: #b91c1c;
+      }
+      @media (prefers-color-scheme: dark) {
+        .error-banner {
+          color: #fca5a5;
+        }
+      }
+      .preview-textarea {
+        min-height: 100px;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.45;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: inherit;
+      }
+      .voice-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .consent-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        min-height: 44px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="banner"
+      style="max-width: 28rem; margin: 0 auto; border-radius: 0"
+    >
+      <strong>Static preview — Sessions 1–4B.</strong> Capture adds fake
+      <strong>consent + Record/Stop → transcript</strong> (no mic, no OpenAI).
+      Same validation as <code>LeadCaptureForm</code> / <code>createLeadManual</code>.
+      No server.
+    </div>
+
+    <section id="screen-landing" class="screen active">
+      <div>
+        <h1>Event Leads</h1>
+        <p class="lead" style="margin-top: 0.75rem">
+          Turn booth conversations into CRM-ready leads in under thirty
+          seconds.
+        </p>
+      </div>
+      <div class="row horizontal">
+        <button type="button" class="btn btn-primary" data-go="login">
+          Sign in
+        </button>
+        <button type="button" class="btn btn-secondary" data-go="signup">
+          Create account
+        </button>
+      </div>
+    </section>
+
+    <section id="screen-login" class="screen">
+      <div>
+        <h1>Sign in</h1>
+        <p style="margin-top: 0.25rem">
+          Loads as <strong>manager</strong> with sample events. Use
+          <strong>Sign up → Rep</strong> to try Session 3 search on the booth
+          briefing.
+        </p>
+      </div>
+      <form class="row" data-form="login">
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" required />
+        </label>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+      <p style="text-align: center">
+        <button type="button" class="btn btn-ghost" data-go="signup">
+          Create account
+        </button>
+      </p>
+      <button type="button" class="btn btn-ghost" data-go="landing">
+        ← Back
+      </button>
+    </section>
+
+    <section id="screen-signup" class="screen">
+      <div>
+        <h1>Create account</h1>
+        <p style="margin-top: 0.25rem">Pick <strong>Rep</strong> to test search.</p>
+      </div>
+      <form class="row" data-form="signup">
+        <label>
+          Email
+          <input type="email" required />
+        </label>
+        <label>
+          Password
+          <input type="password" required minlength="8" />
+        </label>
+        <button type="submit" class="btn btn-primary">Sign up</button>
+      </form>
+      <button type="button" class="btn btn-ghost" data-go="landing">
+        ← Back
+      </button>
+    </section>
+
+    <section id="screen-onboarding" class="screen">
+      <div>
+        <h1>Set up your workspace</h1>
+      </div>
+      <form class="row" data-form="onboarding">
+        <label>
+          Company name
+          <input type="text" name="company" required />
+        </label>
+        <label>
+          Your full name
+          <input type="text" name="name" required />
+        </label>
+        <fieldset>
+          <legend>Role</legend>
+          <label class="radio-row">
+            <input type="radio" name="role" value="manager" required />
+            Manager
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="role" value="rep" />
+            Rep
+          </label>
+        </fieldset>
+        <button type="submit" class="btn btn-primary">Continue</button>
+      </form>
+      <form data-form="signout-preview" style="text-align: center">
+        <button type="submit" class="btn btn-ghost">Sign out</button>
+      </form>
+    </section>
+
+    <section id="screen-dashboard" class="screen scroll">
+      <div class="header-bar">
+        <div>
+          <h1>Events</h1>
+          <p style="margin-top: 0.25rem">
+            <span data-preview-company>Acme</span> ·
+            <span data-preview-role>Manager</span>
+          </p>
+          <p style="font-size: 0.875rem; margin-top: 0.25rem" data-preview-user>
+            —
+          </p>
+        </div>
+        <form data-form="signout-preview">
+          <button type="submit" class="btn btn-secondary">Sign out</button>
+        </form>
+      </div>
+      <div data-new-event-wrap>
+        <button type="button" class="btn btn-primary" data-go="newevent">
+          New event
+        </button>
+      </div>
+      <div data-dashboard-empty class="card hidden"></div>
+      <ul class="event-list" data-event-list></ul>
+    </section>
+
+    <section id="screen-newevent" class="screen scroll">
+      <button type="button" class="btn btn-ghost" data-go="dashboard">
+        ← Events
+      </button>
+      <h1>New event</h1>
+      <form class="row" data-form="newevent">
+        <label>
+          Event name
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Location
+          <input type="text" name="location" />
+        </label>
+        <label>
+          Date
+          <input type="date" name="date" />
+        </label>
+        <label>
+          Briefing
+          <textarea
+            name="briefing"
+            placeholder="Try words like ICP or price for search…"
+          ></textarea>
+        </label>
+        <div class="row horizontal">
+          <button type="submit" class="btn btn-primary">Create</button>
+          <button type="button" class="btn btn-secondary" data-go="dashboard">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section id="screen-event-manager" class="screen scroll">
+      <button type="button" class="btn btn-ghost" data-go="dashboard">
+        ← Events
+      </button>
+      <p style="font-size: 0.875rem; color: var(--muted)">Manager · event setup</p>
+      <h1 data-em-title>Event</h1>
+      <form class="row" data-form="edit-event">
+        <input type="hidden" name="id" data-em-id />
+        <label>
+          Name
+          <input type="text" name="name" data-em-name required />
+        </label>
+        <label>
+          Location
+          <input type="text" name="location" data-em-location />
+        </label>
+        <label>
+          Date
+          <input type="date" name="date" data-em-date />
+        </label>
+        <label>
+          Briefing
+          <textarea name="briefing" data-em-briefing></textarea>
+        </label>
+        <p class="ok hidden" data-em-saved>Saved (preview).</p>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+      <ul style="list-style: none; padding: 0; margin: 1rem 0 0">
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="leads">
+            Leads →
+          </button>
+        </li>
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="capture">
+            Capture lead →
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Rep: Session 3 searchable briefing -->
+    <section id="screen-event-rep" class="screen scroll">
+      <button type="button" class="btn btn-ghost" data-go="dashboard">
+        ← Events
+      </button>
+      <p style="font-size: 0.875rem; color: var(--muted)">Booth briefing</p>
+      <h1 data-er-title>Event</h1>
+      <p data-er-location style="margin-top: 0.5rem"></p>
+      <p data-er-date style="margin-top: 0.25rem; font-size: 0.8rem"></p>
+
+      <div data-rep-briefing-empty class="card hidden">
+        <p class="briefing-h">Briefing</p>
+        <p style="font-size: 0.875rem; color: var(--muted)">
+          No briefing yet. Ask your manager to add talking points here.
+        </p>
+      </div>
+
+      <div data-rep-briefing-filled class="card hidden">
+        <p class="briefing-h">Briefing</p>
+        <label>
+          Search briefing
+          <input
+            type="search"
+            data-rep-search
+            placeholder="e.g. ICP, price, CRM…"
+            autocomplete="off"
+          />
+        </label>
+        <p class="match-hint" data-rep-match aria-live="polite"></p>
+        <div class="briefing-scroll">
+          <div class="briefing-body" data-rep-body></div>
+        </div>
+      </div>
+
+      <ul style="list-style: none; padding: 0; margin: 1rem 0 0">
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="leads">Leads →</button>
+        </li>
+        <li>
+          <button type="button" class="btn btn-ghost" data-go="capture">
+            Capture lead →
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <section id="screen-leads" class="screen scroll">
+      <p style="font-size: 0.875rem; color: var(--muted)" data-leads-event-label></p>
+      <h1>Leads</h1>
+      <p style="margin-top: 0.5rem">Stub — list / CSV later.</p>
+      <button type="button" class="btn btn-ghost" data-go="event-back">
+        ← Event home
+      </button>
+    </section>
+
+    <!-- Capture: Sessions 3 + 4A + 4B (simulated voice) -->
+    <section id="screen-capture" class="screen scroll">
+      <button type="button" class="btn btn-ghost" data-go="event-back-only">
+        ← Event home
+      </button>
+      <p style="font-size: 0.875rem; color: var(--muted)" data-cap-event-label></p>
+      <h1>Capture lead</h1>
+      <p style="margin-top: 0.25rem">
+        Search the briefing (Session 3). Manual fields + optional fake voice
+        (Session 4B preview). Any transcript needs consent — matches the app.
+        AI structuring is still later.
+      </p>
+
+      <p class="success-banner hidden" data-cap-saved role="status">
+        Lead saved. You can add another below.
+      </p>
+
+      <div data-cap-briefing-empty class="card hidden" style="margin-top: 1rem">
+        <p class="briefing-h">Booth briefing</p>
+        <p style="font-size: 0.875rem; color: var(--muted)">No briefing text.</p>
+      </div>
+
+      <div data-cap-briefing-filled class="card hidden" style="margin-top: 1rem">
+        <p class="briefing-h">Booth briefing</p>
+        <label>
+          Search briefing
+          <input
+            type="search"
+            data-cap-search
+            placeholder="Search…"
+            autocomplete="off"
+          />
+        </label>
+        <p class="match-hint" data-cap-match aria-live="polite"></p>
+        <div class="briefing-scroll briefing-scroll-sm">
+          <div class="briefing-body" data-cap-body></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 1rem">
+        <p class="briefing-h">Lead details</p>
+        <p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 1rem">
+          At least one of name, company, email, or phone. Source tag required.
+          Any transcript requires the consent checkbox (like the real app).
+        </p>
+        <p class="error-banner hidden" data-lead-error role="alert"></p>
+        <form class="row" data-form="lead-manual">
+          <fieldset class="border-0 p-0" style="border: none; padding: 0">
+            <legend class="text-base font-semibold" style="margin-bottom: 0.75rem">
+              Contact
+            </legend>
+            <div class="grid-2">
+              <label>
+                First name
+                <input type="text" name="firstName" autocomplete="given-name" />
+              </label>
+              <label>
+                Last name
+                <input type="text" name="lastName" autocomplete="family-name" />
+              </label>
+            </div>
+            <label style="margin-top: 1rem">
+              Company
+              <input type="text" name="company" autocomplete="organization" />
+            </label>
+            <label style="margin-top: 1rem">
+              Job title
+              <input type="text" name="jobTitle" autocomplete="organization-title" />
+            </label>
+            <label style="margin-top: 1rem">
+              Email
+              <input type="email" name="email" autocomplete="email" />
+            </label>
+            <label style="margin-top: 1rem">
+              Phone
+              <input type="tel" name="phone" autocomplete="tel" />
+            </label>
+          </fieldset>
+
+          <fieldset
+            class="card"
+            style="
+              margin-top: 1rem;
+              border: 1px solid var(--border);
+              padding: 1rem;
+            "
+          >
+            <legend class="text-base font-semibold" style="padding: 0 0.25rem">
+              Voice note (simulated)
+            </legend>
+            <p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.75rem">
+              No microphone — <strong>Record</strong> then <strong>Stop</strong> inserts a
+              fake Whisper transcript. Real app calls <code>/api/transcribe</code>.
+            </p>
+            <label class="consent-row">
+              <input
+                type="checkbox"
+                data-preview-voice-consent
+                style="margin-top: 0.2rem; width: 1rem; height: 1rem; flex-shrink: 0"
+              />
+              <span>
+                I have permission to record a short voice note about this
+                conversation.
+              </span>
+            </label>
+            <input type="hidden" data-consent-at value="" />
+            <div class="voice-actions">
+              <button type="button" class="btn btn-secondary" data-btn-record>
+                Record
+              </button>
+              <button type="button" class="btn btn-secondary hidden" data-btn-stop>
+                Stop (0s / 60s)
+              </button>
+            </div>
+            <p
+              class="hidden"
+              style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem"
+              data-voice-status
+            ></p>
+            <p class="error-banner hidden" data-voice-error style="margin-bottom: 0.75rem"></p>
+            <label
+              style="
+                margin-top: 0.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+              "
+            >
+              Transcript
+              <textarea
+                name="transcript"
+                rows="4"
+                class="preview-textarea"
+                placeholder="Fills after fake recording, or type/paste here…"
+              ></textarea>
+            </label>
+          </fieldset>
+
+          <label style="margin-top: 0.5rem">
+            How they found you
+            <select name="sourceTag">
+              <option value="">Select…</option>
+              <option value="walked_by">Walked by booth</option>
+              <option value="attended_talk">Attended talk</option>
+              <option value="referral">Referral</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem">
+            Save lead
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        function uuid() {
+          return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function (c) {
+              var r = (Math.random() * 16) | 0;
+              var v = c === "x" ? r : (r & 0x3) | 0x8;
+              return v.toString(16);
+            }
+          );
+        }
+
+        function escapeRe(s) {
+          return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function renderBriefingBody(el, text, query) {
+          el.textContent = "";
+          var q = (query || "").trim();
+          if (!q) {
+            el.appendChild(document.createTextNode(text));
+            return;
+          }
+          var re = new RegExp("(" + escapeRe(q) + ")", "gi");
+          var parts = text.split(re);
+          parts.forEach(function (part) {
+            if (part.toLowerCase() === q.toLowerCase()) {
+              var m = document.createElement("mark");
+              m.style.background = "rgba(234, 179, 8, 0.45)";
+              m.textContent = part;
+              el.appendChild(m);
+            } else {
+              el.appendChild(document.createTextNode(part));
+            }
+          });
+        }
+
+        function countMatches(text, query) {
+          var q = (query || "").trim();
+          if (!q || !text) return 0;
+          var mm = text.match(new RegExp(escapeRe(q), "gi"));
+          return mm ? mm.length : 0;
+        }
+
+        var state = {
+          role: "manager",
+          company: "Acme Corp",
+          userName: "Alex",
+          events: [],
+          currentId: null,
+        };
+
+        var screens = {
+          landing: document.getElementById("screen-landing"),
+          login: document.getElementById("screen-login"),
+          signup: document.getElementById("screen-signup"),
+          onboarding: document.getElementById("screen-onboarding"),
+          dashboard: document.getElementById("screen-dashboard"),
+          newevent: document.getElementById("screen-newevent"),
+          "event-manager": document.getElementById("screen-event-manager"),
+          "event-rep": document.getElementById("screen-event-rep"),
+          leads: document.getElementById("screen-leads"),
+          capture: document.getElementById("screen-capture"),
+        };
+
+        var scrollScreens = {
+          dashboard: 1,
+          newevent: 1,
+          "event-manager": 1,
+          "event-rep": 1,
+          leads: 1,
+          capture: 1,
+        };
+
+        function show(name) {
+          Object.keys(screens).forEach(function (key) {
+            screens[key].classList.remove("active", "scroll");
+          });
+          var el = screens[name];
+          el.classList.add("active");
+          if (scrollScreens[name]) el.classList.add("scroll");
+          window.scrollTo(0, 0);
+        }
+
+        function formatDate(iso) {
+          if (!iso) return "";
+          var p = iso.split("-");
+          var d = new Date(
+            parseInt(p[0], 10),
+            parseInt(p[1], 10) - 1,
+            parseInt(p[2], 10)
+          );
+          return d.toLocaleDateString(undefined, {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
+
+        function findEvent(id) {
+          for (var i = 0; i < state.events.length; i++) {
+            if (state.events[i].id === id) return state.events[i];
+          }
+          return null;
+        }
+
+        function syncRepBriefingUI() {
+          var ev = findEvent(state.currentId);
+          var text = ev && ev.briefing ? String(ev.briefing) : "";
+          var empty = !text.trim();
+          document
+            .querySelector("[data-rep-briefing-empty]")
+            .classList.toggle("hidden", !empty);
+          document
+            .querySelector("[data-rep-briefing-filled]")
+            .classList.toggle("hidden", empty);
+          if (empty) return;
+          var search = document.querySelector("[data-rep-search]");
+          var body = document.querySelector("[data-rep-body]");
+          var matchEl = document.querySelector("[data-rep-match]");
+          search.value = "";
+          renderBriefingBody(body, text, "");
+          matchEl.textContent = "";
+          search.oninput = function () {
+            var q = search.value;
+            renderBriefingBody(body, text, q);
+            var n = countMatches(text, q);
+            if (!q.trim()) matchEl.textContent = "";
+            else if (n === 0) matchEl.textContent = "No matches in briefing.";
+            else
+              matchEl.textContent =
+                n + " match" + (n === 1 ? "" : "es");
+          };
+        }
+
+        function syncCapBriefingUI() {
+          var ev = findEvent(state.currentId);
+          var text = ev && ev.briefing ? String(ev.briefing) : "";
+          var empty = !text.trim();
+          document
+            .querySelector("[data-cap-briefing-empty]")
+            .classList.toggle("hidden", !empty);
+          document
+            .querySelector("[data-cap-briefing-filled]")
+            .classList.toggle("hidden", empty);
+          if (empty) return;
+          var search = document.querySelector("[data-cap-search]");
+          var body = document.querySelector("[data-cap-body]");
+          var matchEl = document.querySelector("[data-cap-match]");
+          search.value = "";
+          renderBriefingBody(body, text, "");
+          matchEl.textContent = "";
+          search.oninput = function () {
+            var q = search.value;
+            renderBriefingBody(body, text, q);
+            var n = countMatches(text, q);
+            if (!q.trim()) matchEl.textContent = "";
+            else if (n === 0) matchEl.textContent = "No matches in briefing.";
+            else
+              matchEl.textContent =
+                n + " match" + (n === 1 ? "" : "es");
+          };
+        }
+
+        function renderDashboard() {
+          var listEl = document.querySelector("[data-event-list]");
+          var emptyEl = document.querySelector("[data-dashboard-empty]");
+          var newWrap = document.querySelector("[data-new-event-wrap]");
+
+          document.querySelector("[data-preview-company]").textContent =
+            state.company;
+          document.querySelector("[data-preview-user]").textContent =
+            state.userName;
+          document.querySelector("[data-preview-role]").textContent =
+            state.role === "manager" ? "Manager" : "Rep";
+
+          if (state.role === "manager") {
+            newWrap.classList.remove("hidden");
+          } else {
+            newWrap.classList.add("hidden");
+          }
+
+          listEl.innerHTML = "";
+          if (state.events.length === 0) {
+            emptyEl.classList.remove("hidden");
+            emptyEl.textContent =
+              state.role === "manager"
+                ? "No events yet. Create one (or sign in for samples)."
+                : "No events yet. Ask your manager, or sign in as manager once to seed samples.";
+          } else {
+            emptyEl.classList.add("hidden");
+            state.events.forEach(function (ev) {
+              var li = document.createElement("li");
+              var btn = document.createElement("button");
+              btn.type = "button";
+              var meta = "";
+              if (ev.location) meta += ev.location;
+              if (ev.date) {
+                if (meta) meta += " · ";
+                meta += formatDate(ev.date);
+              }
+              btn.innerHTML =
+                '<span class="ev-name"></span><span class="ev-meta"></span>';
+              btn.querySelector(".ev-name").textContent = ev.name;
+              btn.querySelector(".ev-meta").textContent = meta || "Open";
+              btn.addEventListener("click", function () {
+                openEvent(ev.id);
+              });
+              li.appendChild(btn);
+              listEl.appendChild(li);
+            });
+          }
+        }
+
+        function openEvent(id) {
+          state.currentId = id;
+          var ev = findEvent(id);
+          if (!ev) return;
+
+          if (state.role === "manager") {
+            document.querySelector("[data-em-title]").textContent = ev.name;
+            document.querySelector("[data-em-id]").value = ev.id;
+            document.querySelector("[data-em-name]").value = ev.name;
+            document.querySelector("[data-em-location]").value =
+              ev.location || "";
+            document.querySelector("[data-em-date]").value = ev.date || "";
+            document.querySelector("[data-em-briefing]").value =
+              ev.briefing || "";
+            document.querySelector("[data-em-saved]").classList.add("hidden");
+            show("event-manager");
+          } else {
+            document.querySelector("[data-er-title]").textContent = ev.name;
+            var loc = document.querySelector("[data-er-location]");
+            var dt = document.querySelector("[data-er-date]");
+            loc.textContent = ev.location || "";
+            loc.style.display = ev.location ? "block" : "none";
+            if (ev.date) {
+              dt.textContent = formatDate(ev.date);
+              dt.style.display = "block";
+            } else {
+              dt.textContent = "";
+              dt.style.display = "none";
+            }
+            syncRepBriefingUI();
+            show("event-rep");
+          }
+        }
+
+        function setStubScreens() {
+          var ev = findEvent(state.currentId);
+          var name = ev ? ev.name : "Event";
+          var idText = state.currentId || "—";
+          var leadsP = document.querySelector("[data-leads-event-label]");
+          var capP = document.querySelector("[data-cap-event-label]");
+          leadsP.textContent = "";
+          capP.textContent = "";
+          leadsP.appendChild(document.createTextNode(name + " · "));
+          var c1 = document.createElement("code");
+          c1.textContent = idText;
+          leadsP.appendChild(c1);
+          capP.appendChild(document.createTextNode(name + " · "));
+          var c2 = document.createElement("code");
+          c2.textContent = idText;
+          capP.appendChild(c2);
+        }
+
+        var fakeRecordTimer = null;
+        var fakeRecordStopTimer = null;
+        var fakeRecordStart = 0;
+        var isFakeRecording = false;
+
+        function captureVoiceReset() {
+          var form = document.querySelector('[data-form="lead-manual"]');
+          if (!form) return;
+          var cb = form.querySelector("[data-preview-voice-consent]");
+          var ca = form.querySelector("[data-consent-at]");
+          var ta = form.querySelector('textarea[name="transcript"]');
+          var br = form.querySelector("[data-btn-record]");
+          var bs = form.querySelector("[data-btn-stop]");
+          var ve = form.querySelector("[data-voice-error]");
+          var vs = form.querySelector("[data-voice-status]");
+          isFakeRecording = false;
+          if (fakeRecordTimer) {
+            clearInterval(fakeRecordTimer);
+            fakeRecordTimer = null;
+          }
+          if (fakeRecordStopTimer) {
+            clearTimeout(fakeRecordStopTimer);
+            fakeRecordStopTimer = null;
+          }
+          if (cb) cb.checked = false;
+          if (ca) ca.value = "";
+          if (ta) ta.value = "";
+          if (ve) {
+            ve.textContent = "";
+            ve.classList.add("hidden");
+          }
+          if (vs) {
+            vs.textContent = "";
+            vs.classList.add("hidden");
+          }
+          if (br) {
+            br.classList.remove("hidden");
+            br.disabled = false;
+          }
+          if (bs) bs.classList.add("hidden");
+        }
+
+        function wireVoicePreview() {
+          var form = document.querySelector('[data-form="lead-manual"]');
+          if (!form || form.getAttribute("data-voice-wired") === "1") return;
+          form.setAttribute("data-voice-wired", "1");
+          var cb = form.querySelector("[data-preview-voice-consent]");
+          var ca = form.querySelector("[data-consent-at]");
+          var br = form.querySelector("[data-btn-record]");
+          var bs = form.querySelector("[data-btn-stop]");
+          var ta = form.querySelector('textarea[name="transcript"]');
+          var ve = form.querySelector("[data-voice-error]");
+          var vs = form.querySelector("[data-voice-status]");
+
+          function finishFakeRecord() {
+            if (!isFakeRecording) return;
+            isFakeRecording = false;
+            if (fakeRecordTimer) {
+              clearInterval(fakeRecordTimer);
+              fakeRecordTimer = null;
+            }
+            if (fakeRecordStopTimer) {
+              clearTimeout(fakeRecordStopTimer);
+              fakeRecordStopTimer = null;
+            }
+            br.classList.remove("hidden");
+            bs.classList.add("hidden");
+            vs.textContent = "Transcribed (preview — not OpenAI Whisper).";
+            vs.classList.remove("hidden");
+            var fake =
+              "Interested in pricing for about 50 seats. Wants rollout by Q3.";
+            var cur = (ta.value || "").trim();
+            ta.value = cur ? cur + "\n\n" + fake : fake;
+          }
+
+          cb.addEventListener("change", function () {
+            if (cb.checked) {
+              ca.value = new Date().toISOString();
+            } else {
+              ca.value = "";
+            }
+            ve.classList.add("hidden");
+          });
+
+          br.addEventListener("click", function () {
+            ve.classList.add("hidden");
+            if (!cb.checked) {
+              ve.textContent = "Confirm consent before recording.";
+              ve.classList.remove("hidden");
+              return;
+            }
+            isFakeRecording = true;
+            br.classList.add("hidden");
+            bs.classList.remove("hidden");
+            fakeRecordStart = Date.now();
+            bs.textContent = "Stop (0s / 60s)";
+            fakeRecordTimer = setInterval(function () {
+              var s = Math.min(
+                60,
+                Math.floor((Date.now() - fakeRecordStart) / 1000)
+              );
+              bs.textContent = "Stop (" + s + "s / 60s)";
+            }, 200);
+            fakeRecordStopTimer = setTimeout(finishFakeRecord, 60000);
+            vs.textContent = "Recording (preview — no mic)…";
+            vs.classList.remove("hidden");
+          });
+
+          bs.addEventListener("click", function () {
+            finishFakeRecord();
+          });
+        }
+
+        wireVoicePreview();
+
+        document.querySelectorAll("[data-go]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var dest = btn.getAttribute("data-go");
+            if (dest === "dashboard") {
+              renderDashboard();
+            }
+            if (dest === "leads") {
+              setStubScreens();
+            }
+            if (dest === "capture") {
+              setStubScreens();
+              syncCapBriefingUI();
+              document.querySelector("[data-cap-saved]").classList.add("hidden");
+              var le = document.querySelector("[data-lead-error]");
+              le.classList.add("hidden");
+              le.textContent = "";
+              captureVoiceReset();
+            }
+            if (dest === "event-back") {
+              openEvent(state.currentId);
+              return;
+            }
+            if (dest === "event-back-only") {
+              openEvent(state.currentId);
+              return;
+            }
+            show(dest);
+          });
+        });
+
+        document.querySelector('[data-form="login"]').addEventListener("submit", function (e) {
+          e.preventDefault();
+          state.role = "manager";
+          state.company = "Acme Corp";
+          state.userName = "Returning user";
+          state.events = [
+            {
+              id: uuid(),
+              name: "Spring Expo 2026",
+              location: "Hall B, stand 12",
+              date: "2026-05-15",
+              briefing:
+                "ICP: mid-market SaaS. ICP cares about security.\nObjection: price — emphasise ROI in 90 days.\nMention ICP pain: manual spreadsheets.",
+            },
+            {
+              id: uuid(),
+              name: "Partner Summit",
+              location: "Austin",
+              date: "",
+              briefing:
+                "Focus on CRM integration. Ask about their CRM stack.\nPrice talk: anchor on time saved.",
+            },
+          ];
+          renderDashboard();
+          show("dashboard");
+        });
+
+        document.querySelector('[data-form="signup"]').addEventListener("submit", function (e) {
+          e.preventDefault();
+          show("onboarding");
+        });
+
+        document
+          .querySelector('[data-form="onboarding"]')
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            var fd = new FormData(e.target);
+            state.company = String(fd.get("company") || "Co");
+            state.userName = String(fd.get("name") || "You");
+            state.role = fd.get("role") === "rep" ? "rep" : "manager";
+            state.events = [];
+            renderDashboard();
+            show("dashboard");
+          });
+
+        document.querySelector('[data-form="newevent"]').addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (state.role !== "manager") return;
+          var fd = new FormData(e.target);
+          var ev = {
+            id: uuid(),
+            name: String(fd.get("name") || "").trim(),
+            location: String(fd.get("location") || "").trim() || "",
+            date: String(fd.get("date") || "").trim() || "",
+            briefing: String(fd.get("briefing") || "").trim() || "",
+          };
+          if (!ev.name) return;
+          state.events.unshift(ev);
+          e.target.reset();
+          openEvent(ev.id);
+        });
+
+        document
+          .querySelector('[data-form="edit-event"]')
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            var fd = new FormData(e.target);
+            var id = String(fd.get("id"));
+            var ev = findEvent(id);
+            if (!ev) return;
+            ev.name = String(fd.get("name") || "").trim();
+            ev.location = String(fd.get("location") || "").trim() || "";
+            ev.date = String(fd.get("date") || "").trim() || "";
+            ev.briefing = String(fd.get("briefing") || "").trim() || "";
+            document.querySelector("[data-em-title]").textContent = ev.name;
+            var ok = document.querySelector("[data-em-saved]");
+            ok.classList.remove("hidden");
+            setTimeout(function () {
+              ok.classList.add("hidden");
+            }, 2000);
+          });
+
+        document.querySelectorAll('[data-form="signout-preview"]').forEach(function (f) {
+          f.addEventListener("submit", function (e) {
+            e.preventDefault();
+            show("landing");
+          });
+        });
+
+        document
+          .querySelector('[data-form="lead-manual"]')
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            var errEl = document.querySelector("[data-lead-error]");
+            var okEl = document.querySelector("[data-cap-saved]");
+            errEl.classList.add("hidden");
+            errEl.textContent = "";
+            var fd = new FormData(e.target);
+            var source = (fd.get("sourceTag") || "").toString();
+            if (!source) {
+              errEl.textContent = "Choose how they found you.";
+              errEl.classList.remove("hidden");
+              return;
+            }
+            var fn = (fd.get("firstName") || "").toString().trim();
+            var ln = (fd.get("lastName") || "").toString().trim();
+            var co = (fd.get("company") || "").toString().trim();
+            var em = (fd.get("email") || "").toString().trim();
+            var ph = (fd.get("phone") || "").toString().trim();
+            if (!fn && !ln && !co && !em && !ph) {
+              errEl.textContent =
+                "Enter at least a name, company, email, or phone.";
+              errEl.classList.remove("hidden");
+              return;
+            }
+            if (em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+              errEl.textContent = "That email doesn't look valid.";
+              errEl.classList.remove("hidden");
+              return;
+            }
+            var transcript = (fd.get("transcript") || "").toString().trim();
+            var consentCb = e.target.querySelector("[data-preview-voice-consent]");
+            var consentChecked = consentCb && consentCb.checked;
+            var consentAtInput = e.target.querySelector("[data-consent-at]");
+            var consentAtVal = consentAtInput ? consentAtInput.value || "" : "";
+            if (transcript) {
+              if (!consentChecked) {
+                errEl.textContent =
+                  "A transcript requires the recording consent checkbox.";
+                errEl.classList.remove("hidden");
+                return;
+              }
+              if (!consentAtVal.trim()) {
+                errEl.textContent =
+                  "Re-check consent before saving a transcript.";
+                errEl.classList.remove("hidden");
+                return;
+              }
+            }
+            okEl.classList.remove("hidden");
+            e.target.reset();
+            captureVoiceReset();
+          });
+      })();
+    </script>
+  </body>
+</html>
