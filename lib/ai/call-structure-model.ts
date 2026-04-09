@@ -1,21 +1,38 @@
+import { anthropicTextCompletion } from "@/lib/ai/anthropic-messages";
+import {
+  isAnthropicConfigured,
+  isOpenAIConfigured,
+  isTextAiConfigured,
+  TEXT_AI_SETUP_MESSAGE,
+} from "@/lib/ai/llm-env";
 import {
   parseStructuredLeadJson,
   STRUCTURE_SYSTEM_PROMPT,
   type StructuredLead,
 } from "./structured-lead";
 
-export async function structureLeadFromTranscript(
-  transcript: string
+async function structureWithAnthropic(
+  trimmed: string
 ): Promise<{ ok: true; data: StructuredLead } | { ok: false; error: string }> {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) {
-    return { ok: false, error: "Server missing OPENAI_API_KEY" };
+  const res = await anthropicTextCompletion({
+    system: STRUCTURE_SYSTEM_PROMPT,
+    user: `Transcript:\n\n${trimmed.slice(0, 28000)}`,
+    maxTokens: 4096,
+  });
+  if (!res.ok) {
+    return res;
   }
+  const data = parseStructuredLeadJson(res.text);
+  if (!data) {
+    return { ok: false, error: "Could not parse structured lead from model" };
+  }
+  return { ok: true, data };
+}
 
-  const trimmed = transcript.trim();
-  if (!trimmed) {
-    return { ok: false, error: "Transcript is empty" };
-  }
+async function structureWithOpenAI(
+  trimmed: string
+): Promise<{ ok: true; data: StructuredLead } | { ok: false; error: string }> {
+  const key = process.env.OPENAI_API_KEY!.trim();
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -59,4 +76,27 @@ export async function structureLeadFromTranscript(
   }
 
   return { ok: true, data };
+}
+
+export async function structureLeadFromTranscript(
+  transcript: string
+): Promise<{ ok: true; data: StructuredLead } | { ok: false; error: string }> {
+  const trimmed = transcript.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Transcript is empty" };
+  }
+
+  if (!isTextAiConfigured()) {
+    return { ok: false, error: TEXT_AI_SETUP_MESSAGE };
+  }
+
+  if (isAnthropicConfigured()) {
+    return structureWithAnthropic(trimmed);
+  }
+
+  if (isOpenAIConfigured()) {
+    return structureWithOpenAI(trimmed);
+  }
+
+  return { ok: false, error: TEXT_AI_SETUP_MESSAGE };
 }

@@ -1,3 +1,10 @@
+import { anthropicTextCompletion } from "@/lib/ai/anthropic-messages";
+import {
+  isAnthropicConfigured,
+  isOpenAIConfigured,
+  isTextAiConfigured,
+  TEXT_AI_SETUP_MESSAGE,
+} from "@/lib/ai/llm-env";
 import { leadDisplayName } from "@/lib/leads/lead-display-name";
 import type { LeadFollowupRow } from "@/lib/leads/get-lead-by-id";
 import type { LeadListRow } from "@/lib/leads/types";
@@ -58,10 +65,27 @@ async function chatJsonCompletion(
   systemPrompt: string,
   userContent: string
 ): Promise<{ ok: true; raw: string } | { ok: false; error: string }> {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) {
-    return { ok: false, error: "Server missing OPENAI_API_KEY" };
+  if (!isTextAiConfigured()) {
+    return { ok: false, error: TEXT_AI_SETUP_MESSAGE };
   }
+
+  if (isAnthropicConfigured()) {
+    const res = await anthropicTextCompletion({
+      system: systemPrompt,
+      user: userContent,
+      maxTokens: 4096,
+    });
+    if (!res.ok) {
+      return res;
+    }
+    return { ok: true, raw: stripJsonFence(res.text) };
+  }
+
+  if (!isOpenAIConfigured()) {
+    return { ok: false, error: TEXT_AI_SETUP_MESSAGE };
+  }
+
+  const key = process.env.OPENAI_API_KEY!.trim();
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

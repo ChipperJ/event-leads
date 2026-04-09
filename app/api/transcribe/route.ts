@@ -1,3 +1,7 @@
+import {
+  isOpenAIConfigured,
+  OPENAI_WHISPER_SETUP_MESSAGE,
+} from "@/lib/ai/llm-env";
 import { transcribeRateLimitResponse } from "@/lib/rate-limit/core-routes";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
@@ -21,13 +25,10 @@ export async function POST(request: Request) {
     return limited;
   }
 
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) {
-    return NextResponse.json(
-      { error: "Server missing OPENAI_API_KEY" },
-      { status: 500 }
-    );
+  if (!isOpenAIConfigured()) {
+    return NextResponse.json({ error: OPENAI_WHISPER_SETUP_MESSAGE }, { status: 503 });
   }
+  const key = process.env.OPENAI_API_KEY!.trim();
 
   let formData: FormData;
   try {

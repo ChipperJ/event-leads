@@ -71,6 +71,39 @@ export function LeadCaptureForm({ eventId }: Props) {
     };
   }, [stopStreams]);
 
+  const [aiStatus, setAiStatus] = useState<{
+    textAi: boolean;
+    whisper: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/ai-status", { credentials: "include" });
+        if (!res.ok) {
+          if (!cancelled) setAiStatus(null);
+          return;
+        }
+        const body = (await res.json()) as {
+          textAiConfigured?: boolean;
+          whisperConfigured?: boolean;
+        };
+        if (!cancelled) {
+          setAiStatus({
+            textAi: Boolean(body.textAiConfigured),
+            whisper: Boolean(body.whisperConfigured),
+          });
+        }
+      } catch {
+        if (!cancelled) setAiStatus(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const onConsentChange = (checked: boolean) => {
     setConsentChecked(checked);
     setVoiceError(null);
@@ -270,6 +303,43 @@ export function LeadCaptureForm({ eventId }: Props) {
         readOnly
       />
 
+      {aiStatus && !aiStatus.textAi ? (
+        <div
+          className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-foreground"
+          role="status"
+        >
+          <p className="font-medium">AI insights are not configured on this server.</p>
+          <p className="mt-2 text-foreground/85">
+            Add{" "}
+            <code className="rounded bg-background/80 px-1.5 py-0.5 text-[0.9em]">
+              ANTHROPIC_API_KEY
+            </code>{" "}
+            (Claude) or{" "}
+            <code className="rounded bg-background/80 px-1.5 py-0.5 text-[0.9em]">
+              OPENAI_API_KEY
+            </code>{" "}
+            to{" "}
+            <code className="rounded bg-background/80 px-1.5 py-0.5 text-[0.9em]">
+              .env.local
+            </code>
+            , restart{" "}
+            <code className="rounded bg-background/80 px-1.5 py-0.5 text-[0.9em]">
+              npm run dev
+            </code>
+            , then reload. Claude API keys:{" "}
+            <a
+              href="https://console.anthropic.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground underline underline-offset-2"
+            >
+              console.anthropic.com
+            </a>{" "}
+            (Claude Pro on claude.ai is separate from the API).
+          </p>
+        </div>
+      ) : null}
+
       <fieldset className="flex flex-col gap-4 border-0 p-0">
         <legend className="text-base font-semibold text-foreground">
           Contact
@@ -339,9 +409,19 @@ export function LeadCaptureForm({ eventId }: Props) {
           Voice note (optional)
         </legend>
         <p className="text-sm text-foreground/70">
-          Max 60 seconds. Audio is sent to OpenAI Whisper, transcribed, and not
-          stored as a file.
+          Max 60 seconds. When voice transcription is enabled, audio is sent to
+          OpenAI Whisper and not stored as a file. You can always type or paste
+          the transcript below.
         </p>
+        {aiStatus?.textAi && !aiStatus.whisper ? (
+          <p className="text-sm text-amber-800 dark:text-amber-200/90" role="status">
+            Recording uses Whisper and needs{" "}
+            <code className="rounded bg-background/80 px-1 py-0.5 text-[0.9em]">
+              OPENAI_API_KEY
+            </code>
+            . Without it, use the transcript field manually.
+          </p>
+        ) : null}
         <label className="flex min-h-[44px] cursor-pointer items-start gap-3 text-sm">
           <input
             type="checkbox"
@@ -497,7 +577,7 @@ export function LeadCaptureForm({ eventId }: Props) {
         </select>
       </label>
 
-      {state.error ? (
+      {state?.error ? (
         <p className="text-sm text-red-600 dark:text-red-400" role="alert">
           {state.error}
         </p>

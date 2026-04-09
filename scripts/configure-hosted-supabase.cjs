@@ -89,6 +89,8 @@ async function main() {
       `NEXT_PUBLIC_SUPABASE_ANON_KEY=${String(anon).trim()}` +
       nl +
       nl +
+      "ANTHROPIC_API_KEY=" +
+      nl +
       "OPENAI_API_KEY=" +
       nl +
       "RESEND_API_KEY=" +

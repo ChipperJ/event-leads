@@ -53,7 +53,7 @@ export function NewEventForm() {
           className="min-h-[120px] rounded-lg border border-foreground/20 bg-background px-3 py-2 text-base"
         />
       </label>
-      {state.error ? (
+      {state?.error ? (
         <p className="text-sm text-red-600 dark:text-red-400" role="alert">
           {state.error}
         </p>

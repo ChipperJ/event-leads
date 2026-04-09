@@ -63,7 +63,7 @@ export function OnboardingForm() {
             Rep — capture leads on the floor
           </label>
         </fieldset>
-        {state.error ? (
+        {state?.error ? (
           <p className="text-sm text-red-600 dark:text-red-400" role="alert">
             {state.error}
           </p>
