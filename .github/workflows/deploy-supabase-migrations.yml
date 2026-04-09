@@ -1,8 +1,5 @@
 # Applies pending SQL in supabase/migrations/ to your hosted Supabase project.
 # Secrets: SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD, SUPABASE_PROJECT_ID
-#
-# No JavaScript marketplace actions (no actions/checkout, no supabase/setup-cli) so Node 20
-# deprecation notices from third-party actions cannot appear on new runs.
 name: Deploy Supabase migrations
 
 on:
@@ -31,19 +28,17 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
 
     steps:
-      - name: Checkout (GitHub API tarball)
+      - uses: actions/checkout@v4
+
+      # Official Linux binary (avoids npm global install issues on the runner)
+      - name: Install Supabase CLI
         run: |
           set -euo pipefail
-          curl -fsSL \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ github.token }}" \
-            "https://api.github.com/repos/${{ github.repository }}/tarball/${{ github.sha }}" \
-            -o /tmp/repo.tar.gz
-          tar -xzf /tmp/repo.tar.gz -C "${{ github.workspace }}" --strip-components=1
-          rm -f /tmp/repo.tar.gz
-
-      - name: Install Supabase CLI
-        run: npm install -g supabase
+          curl -fsSL "https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz" -o /tmp/supabase.tgz
+          sudo tar -xzf /tmp/supabase.tgz -C /usr/local/bin
+          sudo chmod +x /usr/local/bin/supabase
+          supabase --version
+          rm -f /tmp/supabase.tgz
 
       - name: Verify secrets are present
         run: |
@@ -57,6 +52,5 @@ jobs:
       - name: Link project and push migrations
         run: |
           set -euo pipefail
-          supabase --version
           supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
           supabase db push
