@@ -100,18 +100,21 @@ Copy `.env.example` → `.env.local` and fill in values. Never commit `.env.loca
 **Fast path (Windows, `gh` CLI logged in):** from the repo root run **`npm run setup:hosted`** — it prompts for Supabase values, sets the three GitHub Actions secrets, triggers the migration workflow, and writes **`.env.local`**.
 
 **Or set secrets manually:** In GitHub: **Settings → Secrets and variables → Actions → New repository secret** and add:
+
    - **`SUPABASE_ACCESS_TOKEN`** — [Account → Access Tokens](https://supabase.com/dashboard/account/tokens) (create a token with a name like `github-migrations`).
    - **`SUPABASE_PROJECT_ID`** — your **Project ID** / ref from the dashboard URL: `https://supabase.com/dashboard/project/<this-part>`.
    - **`SUPABASE_DB_PASSWORD`** — the **database password** for this project (from when the project was created, or **Project Settings → Database** if you reset it).
-2. Push to **`main`** or **`master`**, or open **Actions → Deploy Supabase migrations → Run workflow**. The job runs **`supabase link`** and **`supabase db push`** so files under **`supabase/migrations/`** apply in order.
-3. **First-time only:** use an **empty** database (new project, no tables yet). If you already ran the SQL files manually in the SQL Editor, **`db push` can fail** because objects already exist — either use a fresh project, or align history with Supabase’s [migration repair](https://supabase.com/docs/reference/cli/supabase-migration-repair) / support docs.
+
+Then push to **`main`** or **`master`**, or open **Actions → Deploy Supabase migrations → Run workflow**. The job runs **`supabase link`** and **`supabase db push`** so files under **`supabase/migrations/`** apply in order.
+
+**First-time only:** use an **empty** database (new project, no tables yet). If you already ran the SQL files manually in the SQL Editor, **`db push` can fail** because objects already exist — either use a fresh project, or align history with Supabase’s [migration repair](https://supabase.com/docs/reference/cli/supabase-migration-repair) / support docs.
 
 **Manual alternative (same result as CI):** In the SQL editor, run **`001_initial_schema.sql`** then **`002_outreach_log.sql`** end-to-end; optional **`003_retention_optional_transcript_null.sql`**.
 
 **Auth URLs (hosted)**
 
-4. Enable **Email** auth (or your chosen provider) in Supabase Authentication settings.
-5. Add **`http://localhost:3000`** and **`http://localhost:3000/auth/callback`** to **Redirect URLs** if you use email confirmation, magic links, or OAuth. Add the same paths on your production origin when you deploy.
+- Enable **Email** auth (or your chosen provider) in Supabase Authentication settings.
+- Add **`http://localhost:3000`** and **`http://localhost:3000/auth/callback`** to **Redirect URLs** if you use email confirmation, magic links, or OAuth. Add the same paths on your production origin when you deploy.
 
 ### Local Supabase (optional)
 
