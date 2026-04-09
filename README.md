@@ -97,7 +97,9 @@ Copy `.env.example` → `.env.local` and fill in values. Never commit `.env.loca
 
 **Recommended: GitHub Actions (applies migrations from this repo)**
 
-1. In GitHub: **Settings → Secrets and variables → Actions → New repository secret** and add:
+**Fast path (Windows, `gh` CLI logged in):** from the repo root run **`npm run setup:hosted`** — it prompts for Supabase values, sets the three GitHub Actions secrets, triggers the migration workflow, and writes **`.env.local`**.
+
+**Or set secrets manually:** In GitHub: **Settings → Secrets and variables → Actions → New repository secret** and add:
    - **`SUPABASE_ACCESS_TOKEN`** — [Account → Access Tokens](https://supabase.com/dashboard/account/tokens) (create a token with a name like `github-migrations`).
    - **`SUPABASE_PROJECT_ID`** — your **Project ID** / ref from the dashboard URL: `https://supabase.com/dashboard/project/<this-part>`.
    - **`SUPABASE_DB_PASSWORD`** — the **database password** for this project (from when the project was created, or **Project Settings → Database** if you reset it).

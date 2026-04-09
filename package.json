@@ -11,7 +11,8 @@
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
     "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts"
+    "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
+    "setup:hosted": "powershell -ExecutionPolicy Bypass -File ./scripts/configure-hosted-supabase.ps1"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
