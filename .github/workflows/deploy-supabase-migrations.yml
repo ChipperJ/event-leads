@@ -1,5 +1,6 @@
 # Applies pending SQL in supabase/migrations/ to your hosted Supabase project.
 # Repository secrets: SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD, SUPABASE_PROJECT_ID
+# Installs Supabase CLI via npm (avoids supabase/setup-cli Node 20 deprecation notices on Actions).
 name: Deploy Supabase migrations
 
 on:
@@ -23,8 +24,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      # Use Node 24 for JavaScript actions (checkout, setup-cli) per GitHub deprecation timeline
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -32,9 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
+      - name: Install Supabase CLI
+        run: npm install -g supabase
 
       - name: Verify secrets are present
         run: |
