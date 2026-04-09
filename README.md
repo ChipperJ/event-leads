@@ -10,7 +10,7 @@ Mobile-first web app for sales reps to capture event leads with optional voice t
 
 1. Read **`DEVELOPER_HANDOFF.md`** (5-minute checklist).
 2. Copy **`.env.example`** → **`.env.local`** and fill variables (see **Environment variables** below).
-3. In Supabase: run **`001_initial_schema.sql`** then **`002_outreach_log.sql`** (see **Database setup**).
+3. Apply database migrations: use **GitHub Actions** (recommended; see **Database setup → Hosted project**) or run the SQL files manually in the Supabase SQL editor.
 4. Run **`npm install`** then **`npm run dev`** → [http://localhost:3000](http://localhost:3000).
 5. Use **`README.md`** (this file) for routes/APIs and **`decisions.md`** for how each session was built.
 
@@ -93,11 +93,27 @@ Copy `.env.example` → `.env.local` and fill in values. Never commit `.env.loca
 
 ## Database setup
 
-1. In the Supabase SQL editor (or CLI), run **`supabase/migrations/001_initial_schema.sql`** end-to-end.
-2. Run **`supabase/migrations/002_outreach_log.sql`** after `001` (email/SMS **`outreach_log`** table + RLS). **Required before Session 9** follow-up routes; see **`decisions.md`** Session 8 if this step was skipped.
-3. Optional: **`003_retention_optional_transcript_null.sql`** — transcript retention template (commented `UPDATE`).
+### Hosted project (Supabase Dashboard)
+
+**Recommended: GitHub Actions (applies migrations from this repo)**
+
+1. In GitHub: **Settings → Secrets and variables → Actions → New repository secret** and add:
+   - **`SUPABASE_ACCESS_TOKEN`** — [Account → Access Tokens](https://supabase.com/dashboard/account/tokens) (create a token with a name like `github-migrations`).
+   - **`SUPABASE_PROJECT_ID`** — your **Project ID** / ref from the dashboard URL: `https://supabase.com/dashboard/project/<this-part>`.
+   - **`SUPABASE_DB_PASSWORD`** — the **database password** for this project (from when the project was created, or **Project Settings → Database** if you reset it).
+2. Push to **`main`** or **`master`**, or open **Actions → Deploy Supabase migrations → Run workflow**. The job runs **`supabase link`** and **`supabase db push`** so files under **`supabase/migrations/`** apply in order.
+3. **First-time only:** use an **empty** database (new project, no tables yet). If you already ran the SQL files manually in the SQL Editor, **`db push` can fail** because objects already exist — either use a fresh project, or align history with Supabase’s [migration repair](https://supabase.com/docs/reference/cli/supabase-migration-repair) / support docs.
+
+**Manual alternative (same result as CI):** In the SQL editor, run **`001_initial_schema.sql`** then **`002_outreach_log.sql`** end-to-end; optional **`003_retention_optional_transcript_null.sql`**.
+
+**Auth URLs (hosted)**
+
 4. Enable **Email** auth (or your chosen provider) in Supabase Authentication settings.
-5. For local dev, add **`http://localhost:3000`** and **`http://localhost:3000/auth/callback`** to **Redirect URLs** if you use email confirmation, magic links, or OAuth. Add the same paths on your production origin when you deploy.
+5. Add **`http://localhost:3000`** and **`http://localhost:3000/auth/callback`** to **Redirect URLs** if you use email confirmation, magic links, or OAuth. Add the same paths on your production origin when you deploy.
+
+### Local Supabase (optional)
+
+Requires [Docker Desktop](https://docs.docker.com/desktop). From the repo root: **`npm run supabase:start`** applies migrations and seeds (see **`supabase/seed.sql`**). Run **`npm run supabase:status`** and copy **API URL** and **anon key** into **`.env.local`**. Use **`npm run db:reset`** to reapply migrations. Regenerate TypeScript DB types with **`npm run db:types`** after schema changes.
 
 ---
 
