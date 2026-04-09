@@ -55,4 +55,4 @@ jobs:
         run: |
           set -euo pipefail
           supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
-          supabase db push
+          supabase db push --yes
