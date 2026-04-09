@@ -97,7 +97,7 @@ Copy `.env.example` → `.env.local` and fill in values. Never commit `.env.loca
 
 **Recommended: GitHub Actions (applies migrations from this repo)**
 
-**Fast path (Windows, `gh` CLI logged in):** from the repo root run **`npm run setup:hosted`** — it prompts for Supabase values, sets the three GitHub Actions secrets, triggers the migration workflow, and writes **`.env.local`**.
+**Fast path (`gh` CLI logged in):** from the repo root run **`npm run setup:hosted`** (not `npx`; script name is **`setup:hosted`**). It prompts for Supabase values, sets the three GitHub Actions secrets, triggers the migration workflow, and writes **`.env.local`**. Uses **Node** (`scripts/configure-hosted-supabase.cjs`) so paths with spaces (e.g. `Coding Projects`) work on Windows.
 
 **Or set secrets manually:** In GitHub: **Settings → Secrets and variables → Actions → New repository secret** and add:
 
