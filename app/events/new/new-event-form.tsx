@@ -2,7 +2,8 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { createEvent, eventFormInitialState } from "../actions";
+import { createEvent } from "../actions";
+import { eventFormInitialState } from "../event-form-state";
 
 function SubmitButton() {
   const { pending } = useFormStatus();

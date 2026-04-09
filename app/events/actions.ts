@@ -1,12 +1,9 @@
 "use server";
 
+import type { EventFormState } from "@/app/events/event-form-state";
 import { requireManager } from "@/lib/auth/profile";
 import { isUuid } from "@/lib/validation/is-uuid";
 import { redirect } from "next/navigation";
-
-export type EventFormState = { error: string | null };
-
-export const eventFormInitialState: EventFormState = { error: null };
 
 export async function createEvent(
   _prev: EventFormState,

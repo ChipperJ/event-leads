@@ -2,7 +2,8 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { eventFormInitialState, updateEvent } from "../actions";
+import { updateEvent } from "../actions";
+import { eventFormInitialState } from "../event-form-state";
 import type { EventRow } from "@/lib/events/types";
 
 function SubmitButton() {

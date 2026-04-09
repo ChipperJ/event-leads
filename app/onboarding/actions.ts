@@ -1,9 +1,8 @@
 "use server";
 
+import type { OnboardingState } from "@/app/onboarding/onboarding-form-state";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-
-export type OnboardingState = { error: string | null };
 
 export async function completeOnboarding(
   _prev: OnboardingState,

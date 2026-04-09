@@ -3,10 +3,8 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  createLeadManual,
-  leadManualFormInitialState,
-} from "@/app/events/[id]/capture/actions";
+import { createLeadManual } from "@/app/events/[id]/capture/actions";
+import { leadManualFormInitialState } from "@/app/events/[id]/capture/lead-manual-form-state";
 import {
   parseStructuredLeadFromClient,
   type StructuredLead,

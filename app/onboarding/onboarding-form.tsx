@@ -3,9 +3,8 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth/actions";
-import { completeOnboarding, type OnboardingState } from "./actions";
-
-const initial: OnboardingState = { error: null };
+import { completeOnboarding } from "./actions";
+import { onboardingFormInitialState } from "./onboarding-form-state";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -17,7 +16,10 @@ function SubmitButton() {
 }
 
 export function OnboardingForm() {
-  const [state, formAction] = useFormState(completeOnboarding, initial);
+  const [state, formAction] = useFormState(
+    completeOnboarding,
+    onboardingFormInitialState
+  );
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4">

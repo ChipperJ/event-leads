@@ -1,5 +1,6 @@
 "use server";
 
+import type { LeadManualFormState } from "./lead-manual-form-state";
 import { parseStructuredLeadFromClient } from "@/lib/ai/structured-lead";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth/profile";
@@ -8,12 +9,6 @@ import { isUuid } from "@/lib/validation/is-uuid";
 import { isValidEmail } from "@/lib/validation/email";
 import { normalizePhoneToE164 } from "@/lib/validation/phone-e164";
 import { redirect } from "next/navigation";
-
-export type LeadManualFormState = { error: string | null };
-
-export const leadManualFormInitialState: LeadManualFormState = {
-  error: null,
-};
 
 const MAX_LEN = 500;
 const MAX_TRANSCRIPT = 32_000;
