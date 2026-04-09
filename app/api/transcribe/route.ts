@@ -4,6 +4,8 @@ import {
 } from "@/lib/ai/llm-env";
 import { transcribeRateLimitResponse } from "@/lib/rate-limit/core-routes";
 import { createClient } from "@/lib/supabase/server";
+import fs from "fs";
+import path from "path";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -26,6 +28,16 @@ export async function POST(request: Request) {
   }
 
   if (!isOpenAIConfigured()) {
+    if (process.env.NODE_ENV === "development") {
+      const envLocal = path.join(process.cwd(), ".env.local");
+      console.warn(
+        "[api/transcribe] OPENAI_API_KEY is not set on the server.",
+        "cwd:",
+        process.cwd(),
+        ".env.local exists:",
+        fs.existsSync(envLocal)
+      );
+    }
     return NextResponse.json({ error: OPENAI_WHISPER_SETUP_MESSAGE }, { status: 503 });
   }
   const key = process.env.OPENAI_API_KEY!.trim();
