@@ -20,7 +20,7 @@ export default function SignupPage() {
     setMessage(null);
     setLoading(true);
     const supabase = createClient();
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -29,8 +29,14 @@ export default function SignupPage() {
       setError(signUpError.message);
       return;
     }
+    // If email confirmation is OFF in Supabase, you get a session immediately — go to onboarding.
+    if (data.session) {
+      router.push("/onboarding");
+      router.refresh();
+      return;
+    }
     setMessage(
-      "Check your email to confirm your account if required, then sign in."
+      "Check your email to confirm your account, then sign in. Or in Supabase: Authentication → Providers → Email → turn OFF \"Confirm email\" for local development."
     );
     router.refresh();
   }
